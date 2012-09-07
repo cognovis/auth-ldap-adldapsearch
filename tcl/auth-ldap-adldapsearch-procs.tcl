@@ -170,7 +170,8 @@ ad_proc -private auth::ldap::check_password {
     @param password_from_user The password entered by the user.
     @return 1 if passwords match, 0 otherwise.
 } {
-    ns_log Notice "auth-ldap-adldapsearch: auth::ldap::check_password $password_from_ldap $password_from_user"
+    # ns_log Notice "auth-ldap-adldapsearch: auth::ldap::check_password $password_from_ldap $password_from_user"
+    ns_log Notice "auth-ldap-adldapsearch: auth::ldap::check_password" 
 
     set result 0
 
@@ -214,7 +215,8 @@ ad_proc -private auth::ldap::set_password {
 } {
     Update an LDAP user's password.
 } {
-    ns_log Notice "auth-ldap-adldapsearch: set_password -dn $dn -new_password $new_password -parameters $parameters"
+    # ns_log Notice "auth-ldap-adldapsearch: set_password -dn $dn -new_password $new_password -parameters $parameters"
+    ns_log Notice "auth-ldap-adldapsearch: set_password -dn $dn" 
 
     # Parameters
     array set params $parameters
@@ -281,7 +283,8 @@ ad_proc -private auth::ldap::authentication::Authenticate {
     </ul>
 
 } {
-    ns_log Notice "auth-ldap-adldapsearch: auth::ldap::authentication::Authenticate: username=$username, pwd=$password, auth_id=$authority_id, params='$parameters'"
+    # ns_log Notice "auth-ldap-adldapsearch: auth::ldap::authentication::Authenticate: username=$username, pwd=$password, auth_id=$authority_id, params='$parameters'"
+    ns_log Notice "auth-ldap-adldapsearch: auth::ldap::authentication::Authenticate: username=$username, auth_id=$authority_id, params='$parameters'"
 
     # Default setting for auth_info return hash: Bad Password
     set auth_info(auth_status) "bad_password"
@@ -390,7 +393,9 @@ ad_proc -private auth::ldap::authentication::Authenticate {
 	    # For OpenLDAP auth, we retreive the "userPassword" field of the user and
 	    # check if we can construct the same hash
 	    ns_log Notice "auth::ldap::authentication::Authenticate: OpenLDAP"
-	    ns_log Notice "ldapsearch -x -H $uri -D $bind_dn -w $password -b $base_dn '$username_attribute=$username' userPassword"
+	    # ns_log Notice "ldapsearch -x -H $uri -D $bind_dn -w $password -b $base_dn '$username_attribute=$username' userPassword"
+	    ns_log Notice "ldapsearch -x -H $uri -D $bind_dn -w xxxxxxx -b $base_dn '$username_attribute=$username' userPassword"
+
 	    set return_code [catch {
 		# Bind as "Manager" and retreive the userPassword field for
 		exec ldapsearch -x -H $uri -D $bind_dn -w $password -b $base_dn "$username_attribute=$username" userPassword
@@ -410,7 +415,9 @@ ad_proc -private auth::ldap::authentication::Authenticate {
 
 		# Successfully extacted password
 		set ldap_password_encoded [string trim $ldap_password_encoded]
-		ns_log Notice "auth::ldap::authentication::Authenticate: found encoded password=$ldap_password_encoded]"
+
+		# ns_log Notice "auth::ldap::authentication::Authenticate: found encoded password=$ldap_password_encoded]"
+
 		set password_ok_p [CheckOpenLDAPPassword $password $ldap_password_encoded]
 
 		if {$password_ok_p} {
@@ -431,7 +438,8 @@ ad_proc -private auth::ldap::authentication::Authenticate {
 
 		} else {
 		    # Wrong password
-		    ns_log Notice "auth::ldap::authentication::Authenticate: Wrong password: password='$password', ldap_password='$ldap_password'"
+		    # ns_log Notice "auth::ldap::authentication::Authenticate: Wrong password: password='$password', ldap_password='$ldap_password'"
+		    ns_log Notice "auth::ldap::authentication::Authenticate: Wrong password"
 		    set auth_info(auth_message) "Bad user or password"
 		    return [array get auth_info]
 		}
@@ -460,9 +468,9 @@ ad_proc -private auth::ldap::authentication::CheckOpenLDAPPassword {
     Currently supports CRYPT (13 and 34 digit) and MD5 hashes
     Returns 1 on a successfull match, or 0 otherwise.
 } {
-    ns_log Notice "auth-ldap-adldapsearch: auth::ldap::authentication::CheckOpenLDAPPassword: pwd=$password_from_user, ldap_pwd_enc=$ldap_password_encoded"
+    # ns_log Notice "auth-ldap-adldapsearch: auth::ldap::authentication::CheckOpenLDAPPassword: pwd=$password_from_user, ldap_pwd_enc=$ldap_password_encoded"
     set ldap_password [::base64::decode [string trim $ldap_password_encoded]]
-    ns_log Notice "auth::ldap::authentication::CheckOpenLDAPPassword: pwd=$password_from_user, ldap_pwd=$ldap_password"
+    # ns_log Notice "auth::ldap::authentication::CheckOpenLDAPPassword: pwd=$password_from_user, ldap_pwd=$ldap_password"
 
     # 1. Check for plain text passwords stored in OpenLDAP? That's an easy one...
     if {$password_from_user == $ldap_password} { return 1 }
@@ -472,7 +480,10 @@ ad_proc -private auth::ldap::authentication::CheckOpenLDAPPassword {
     # Example: {CRYPT}aUihad99hmev6: "aU" is the salt
     set salt [string range $ldap_password 0 1]
     set my_digest "{CRYPT}[ns_crypt $password_from_user $salt]"
-    ns_log Notice "auth-ldap-adldapsearch: auth::ldap::authentication::CheckOpenLDAPPassword: my_digest=$my_digest, ldap_pwd=$ldap_password"
+
+    # ns_log Notice "auth-ldap-adldapsearch: auth::ldap::authentication::CheckOpenLDAPPassword: my_digest=$my_digest, ldap_pwd=$ldap_password"
+    ns_log Notice "auth-ldap-adldapsearch: auth::ldap::authentication::CheckOpenLDAPPassword: my_digest=$my_digest, ldap_pwd=xxxxxxxxxx"
+
     if {$my_digest == $ldap_password} { return 1 }
 
     # 3. Check for 34 digit MD5 hash delivered by some glibc2 systems
@@ -545,7 +556,7 @@ ad_proc -public auth::ldap::authentication::Sync {
     } else {
 	set auth_info(auth_status) "sync_error"
 	set auth_info(user_id) 0
-	set auth_info(auth_message) "LDAP error during sync with user '$system_bind_dn':<br><pre>$debug</pre>"
+	set auth_info(auth_message) "LDAP error during sync with user '$username':<br><pre>$debug</pre>"
 	set auth_info(account_status) "ok"
 	set auth_info(account_message) ""
 	return [array get auth_info]
@@ -928,7 +939,9 @@ ad_proc -private auth::ldap::password::ChangePassword {
     Implements the ChangePassword operation of the auth_password 
     service contract for LDAP.
 } {
-    ns_log Notice "auth-ldap-adldapsearch: auth::ldap::password::ChangePassword $username $old_password $new_password $parameters $authority_id"
+
+    # ns_log Notice "auth-ldap-adldapsearch: auth::ldap::password::ChangePassword $username $old_password $new_password $parameters $authority_id"
+    ns_log Notice "auth-ldap-adldapsearch: auth::ldap::password::ChangePassword $username $parameters $authority_id"
 
     # Parameters
     array set params $parameters
@@ -975,7 +988,7 @@ ad_proc -private auth::ldap::password::RetrievePassword {
     Implements the RetrievePassword operation of the auth_password 
     service contract for LDAP.
 } {
-    ns_log Notice "auth-ldap-adldapsearch: auth::ldap::password::RetrievePassword $username $parameters"
+    # ns_log Notice "auth-ldap-adldapsearch: auth::ldap::password::RetrievePassword $username $parameters"
     return { password_status not_supported }
 }
 
@@ -1061,7 +1074,8 @@ ad_proc -private auth::ldap::registration::Register {
     Implements the Register operation of the auth_registration
     service contract.
 } {
-    ns_log Notice "auth-ldap-adldapsearch: auth::ldap::registration::Register $parameters $username $authority_id $first_names $last_name $screen_name $email $url $password $secret_question $secret_answer"
+    # ns_log Notice "auth-ldap-adldapsearch: auth::ldap::registration::Register $parameters $username $authority_id $first_names $last_name $screen_name $email $url $password $secret_question $secret_answer"
+    ns_log Notice "auth-ldap-adldapsearch: auth::ldap::registration::Register $parameters $username $authority_id $first_names $last_name $screen_name $email $url "
 
     # Parameters
     array set params $parameters
