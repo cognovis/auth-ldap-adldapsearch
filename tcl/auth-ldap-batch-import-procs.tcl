@@ -106,7 +106,9 @@ ad_proc -private auth::ldap::batch_import::read_ldif_file {
 	    # For OpenLDAP auth, we retreive the "userPassword" field of the user and
 	    # check if we can construct the same hash
 	    ns_log Notice "auth::ldap::batch_import::read_ldif_file OpenLDAP"
-	    ns_log Notice "ldapsearch -x -H $uri -D $system_bind_dn -w $system_bind_pw -b $base_dn $query $attributes"
+	    # ns_log Notice "ldapsearch -x -H $uri -D $system_bind_dn -w $system_bind_pw -b $base_dn $query $attributes"
+	    ns_log Notice "ldapsearch -x -H $uri -D $system_bind_dn -w xxxxxxx -b $base_dn $query $attributes"
+
 	    append debug "Going to execute command: ldapsearch -x -H $uri -D $system_bind_dn -w $system_bind_pw -b $base_dn (objectClass=$object_class) $attributes\n"
 	    set return_code [catch {
 		# Bind as "Manager" and retreive the userPassword field for
