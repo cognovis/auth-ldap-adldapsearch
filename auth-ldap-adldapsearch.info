@@ -8,7 +8,7 @@
     <singleton-p>t</singleton-p>
     <auto-mount>auth-ldap-adldapsearch</auto-mount>
 
-    <version name="3.4.0.0.0" url="http://openacs.org/repository/download/apm/auth-ldap-adldapsearch-3.4.0.0.0.apm">
+    <version name="4.0.0.0.0" url="http://openacs.org/repository/download/apm/auth-ldap-adldapsearch-4.0.0.0.0.apm">
         <owner url="mailto:frank.bergmann@project-open.com">Frank Bergmann</owner>
         <summary>Special version of the generic LDAP authentication drivers to authenticate to MS Active Directory servers via the 'ldapsearch' command line tool.</summary>
         <vendor url="http://www.project-open.com/">]project-open[</vendor>
