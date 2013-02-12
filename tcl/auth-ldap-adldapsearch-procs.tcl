@@ -337,6 +337,10 @@ ad_proc -private auth::ldap::authentication::Authenticate {
 
 	    # ------------------------------------------------------------------------------
 	    # For AD auth, we just try to bind as the user and check if that is OK.
+
+	    # Malte 130211: Fixed issue with UTF8 characters
+	    set password [encoding convertto "utf-8" $password]
+
 	    ns_log Notice "auth::ldap::authentication::Authenticate: Active Directory"
 	    ns_log Notice "ldapsearch -n -x -H $uri -D $bind_dn -w xxxxxxxxx"
 	    set return_code [catch {
