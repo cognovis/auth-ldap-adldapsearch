@@ -571,13 +571,16 @@ ad_proc -private auth::ldap::batch_import::parse_user {
 
 	set creation_status $creation_info(creation_status)
 	if {"ok" != $creation_status} {
-
-	    set creation_message $creation_info(creation_message)
-	    append creation_message $creation_info(element_messages)
+	        set creation_message ""
+	    if { [info exists creation_info(creation_message)] } {
+		append creation_message $creation_info(creation_message)
+	    }
+	    if { [info exists creation_info(element_messages)] } {
+		append creation_message $creation_info(element_messages)
+	    }
 	    ns_log Notice "auth::ldap::batch_import::parse_user: dn=$dn: Failed to create user dn=$dn: [array get creation_info]"
 	    append debug "Failed to create user dn=$dn\n"
 	    append debug "Failed to create reason: $creation_message\n"
-
 	    return [list result 0 oid 0 debug $debug]
 	}
 
