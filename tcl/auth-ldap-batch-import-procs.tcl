@@ -741,6 +741,8 @@ ad_proc -private auth::ldap::batch_import::parse_user {
 			lower(cost_center_code) = lower(:department_name)
 	" -default 0]
 
+	ns_log Notice "auth::ldap::batch_import::parse_user: Found department_id: $department_id for department_name: $department_name"
+
 	# Create a cost center if it didn't exist yet
 	if {"" == $department_id || 0 == $department_id} {
 
