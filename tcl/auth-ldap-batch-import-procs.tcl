@@ -733,12 +733,18 @@ ad_proc -private auth::ldap::batch_import::parse_user {
     set department_name ""
     if {[info exists hash(department)]} { set department_name $hash(department) }
     if {[string length $department_name] > 2} {
+
+	# KH: Department names 'Country, Dep' and 'Country -Dep' will result in same label, so we have check its existence
+	set department_label [string tolower $department_name]
+	regsub -all -nocase {[^a-zA-Z0-9]} $department_label "_" department_label
+
 	set department_id [db_string uid "
 		select	min(cost_center_id)
 		from	im_cost_centers
 		where	lower(cost_center_name) = lower(:department_name) OR
 			lower(cost_center_label) = lower(:department_name) OR
-			lower(cost_center_code) = lower(:department_name)
+			lower(cost_center_code) = lower(:department_name) OR 
+			lower(cost_center_label) = lower(:department_label)
 	" -default 0]
 
 	ns_log Notice "auth::ldap::batch_import::parse_user: Found department_id: $department_id for department_name: $department_name"
@@ -747,8 +753,6 @@ ad_proc -private auth::ldap::batch_import::parse_user {
 	if {"" == $department_id || 0 == $department_id} {
 
 	    set department_name [string trim $department_name]
-	    set department_label [string tolower $department_name]
-	    regsub -all -nocase {[^a-zA-Z0-9]} $department_label "_" department_label
 	    set department_code "Co[string range $department_name 0 0][string range $department_label 1 1]"
 	    set exists_p [db_string ccex "select count(*) from im_cost_centers where cost_center_code = :department_code"]
 	    set ctr 0
