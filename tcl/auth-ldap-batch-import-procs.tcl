@@ -80,7 +80,7 @@ ad_proc -private auth::ldap::batch_import::read_ldif_file {
 
 	    set sl ""
 	    if {"" != $size_limit} { set sl "-z $size_limit" }
-	    set cmd "ldapsearch $sl -x -H $uri -D $system_bind_dn -w $system_bind_pw -b $base_dn $query $attributes"
+	    set cmd "ldapsearch $sl -x -H $uri -D $system_bind_dn -w $system_bind_pw -b $base_dn -E pr=1000/noprompt $query $attributes"
 	    ns_log Notice "auth::ldap::batch_import::read_ldif_file: cmd=$cmd"
 	    append debug "Going to execute command: $cmd\n"
 
@@ -107,12 +107,12 @@ ad_proc -private auth::ldap::batch_import::read_ldif_file {
 	    # check if we can construct the same hash
 	    ns_log Notice "auth::ldap::batch_import::read_ldif_file OpenLDAP"
 	    # ns_log Notice "ldapsearch -x -H $uri -D $system_bind_dn -w $system_bind_pw -b $base_dn $query $attributes"
-	    ns_log Notice "ldapsearch -x -H $uri -D $system_bind_dn -w xxxxxxx -b $base_dn $query $attributes"
+	    ns_log Notice "ldapsearch -x -H $uri -D $system_bind_dn -w xxxxxxx -b $base_dn -E pr=1000/noprompt $query $attributes"
 
-	    append debug "Going to execute command: ldapsearch -x -H $uri -D $system_bind_dn -w $system_bind_pw -b $base_dn (objectClass=$object_class) $attributes\n"
+	    append debug "Going to execute command: ldapsearch -x -H $uri -D $system_bind_dn -w $system_bind_pw -b $base_dn -E pr=1000/noprompt (objectClass=$object_class) $attributes\n"
 	    set return_code [catch {
 		# Bind as "Manager" and retreive the userPassword field for
-		exec ldapsearch -x -H $uri -D $system_bind_dn -w $system_bind_pw -b $base_dn $query $attributes
+		exec ldapsearch -x -H $uri -D $system_bind_dn -w $system_bind_pw -b $base_dn -E pr=1000/noprompt $query $attributes
 	    } err_msg]
 	    ns_log Notice "auth::ldap::batch_import::read_ldif_file return_code=$return_code, msg=$err_msg"
 
