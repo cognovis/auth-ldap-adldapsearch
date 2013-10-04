@@ -584,6 +584,11 @@ ad_proc -private auth::ldap::batch_import::parse_user {
 	    return [list result 0 oid 0 debug $debug]
 	}
 
+	# Invisible parameter, make it visible when use case has been verified by other clients
+	if { [parameter::get -package_id [apm_package_id_from_key auth-ldap-adldapsearch] -parameter "AddAutomaticallyToGroupEmployees" -default 0] } {
+	    im_profile::add_member -profile_id [im_profile_employees] -user_id $user_id
+	}
+
 	# Set creation user
 	db_dml update_creation_user_id "
                 update acs_objects
