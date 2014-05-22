@@ -825,6 +825,11 @@ ad_proc auth::ldap::batch_import::parse_ad_country_code {
     for one of them.
 } {
     set cc [string tolower $country_code]
+    if {![regexp {^[a-zA-Z_\-\ ]+$} $cc]} {
+        im_security_alert -location auth::ldap::batch_import::parse_ad_country_code -message "SQL Injection Attempt" -value $cc -severity "Severe"
+        set cc ""
+    }
+
     set exists_p [util_memoize [list db_string ccex "select count(*) from country_codes where iso='$cc'"]]
     if {$exists_p} { return $cc }
 
