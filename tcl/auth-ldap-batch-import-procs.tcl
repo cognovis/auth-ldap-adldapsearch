@@ -525,7 +525,7 @@ ad_proc -private auth::ldap::batch_import::parse_user {
 
     # Write hash variables to local variables
     foreach var [array names hash] {
-	set $var $hash($var)
+        set $var $hash($var)
     }
 
     # Make sure the first letter of the first name is in upper case
@@ -807,6 +807,7 @@ ad_proc -private auth::ldap::batch_import::parse_user {
 		where employee_id = :user_id
 	"
     }
+    callback auth::ldap::batch_import::parse_user_after_update -user_id $user_id -dn $dn
 
     return [list result 1 oid 0 debug $debug]
 }
@@ -910,3 +911,12 @@ ad_proc -private auth::ldap::batch_import::import_groups {
     return [list result 0 debug $debug]   
 }
 
+ad_proc -public -callback auth::ldap::batch_import::parse_user_after_update {
+    -user_id:required
+    -dn:required
+} {
+    This callback allows for additional actions based on the DN once the user is imported
+
+    @param user_id UserID of the user being imported
+    @param dn DN which comes from LDAP
+} -
